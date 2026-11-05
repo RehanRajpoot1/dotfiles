@@ -1,0 +1,84 @@
+# Rehan's cheat sheet
+# Format:  category | description | command
+# Naya cheat add karne ke liye:  cheat-add docker "description" "command"
+
+docker  | Saare containers (band wale bhi)              | docker ps -a
+docker  | Container ke andar shell                      | docker exec -it <container> sh
+docker  | Live logs dekho                               | docker logs -f --tail 100 <container>
+docker  | Container stop + remove                       | docker rm -f <container>
+docker  | Image build karo                              | docker build -t <name>:<tag> .
+docker  | Image ki layers aur size                      | docker history <image>
+docker  | CPU / RAM usage sab containers ka             | docker stats --no-stream
+docker  | Container ki poori details                    | docker inspect <container>
+docker  | Container ka IP address                       | docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' <container>
+docker  | Faltu images/containers saaf karo             | docker system prune -a
+docker  | Disk kitni use ho rahi                        | docker system df
+docker  | Context badlo (local/remote)                  | docker context use <context>
+compose | Project chalao background mein                | docker compose up -d
+compose | Rebuild karke chalao                          | docker compose up -d --build
+compose | Project band + volumes delete                 | docker compose down -v
+compose | Ek service ke logs                            | docker compose logs -f <service>
+compose | Final config check karo                       | docker compose config
+
+k8s     | Saare pods (har namespace)                    | kubectl get pods -A
+k8s     | Pod ki details aur events                     | kubectl describe pod <pod>
+k8s     | Pod ke logs (pichle crash ke bhi)             | kubectl logs <pod> --previous
+k8s     | Pod ke andar shell                            | kubectl exec -it <pod> -- sh
+k8s     | YAML apply karo                               | kubectl apply -f <file.yaml>
+k8s     | Deployment restart karo                       | kubectl rollout restart deployment/<name>
+k8s     | Rollout status                                | kubectl rollout status deployment/<name>
+k8s     | Pichle version par wapas                      | kubectl rollout undo deployment/<name>
+k8s     | Replicas badhao/ghatao                        | kubectl scale deployment/<name> --replicas=3
+k8s     | Local port se service kholo                   | kubectl port-forward svc/<service> 8080:80
+k8s     | Recent events (errors dhoondne ke liye)       | kubectl get events --sort-by=.lastTimestamp
+k8s     | Current context / cluster                     | kubectl config current-context
+
+git     | Short status                                  | git status -sb
+git     | Graph ke saath log                            | git log --oneline --graph --decorate -20
+git     | Pichla commit message badlo                   | git commit --amend
+git     | Changes side par rakho (new files bhi)        | git stash -u
+git     | Stash wapas lao                               | git stash pop
+git     | Last commit undo, changes rakho               | git reset --soft HEAD~1
+git     | File ko last commit jaisa karo                | git restore <file>
+git     | Naya branch bana kar switch                   | git switch -c <branch>
+git     | Remote ki saaf branches hatao                 | git fetch --prune
+git     | Kis ne ye line likhi                          | git blame <file>
+
+aws     | Main kaun hoon (credentials check)            | aws sts get-caller-identity
+aws     | EC2 instances ki list                         | aws ec2 describe-instances --query "Reservations[].Instances[].[InstanceId,State.Name,PublicIpAddress,Tags[?Key=='Name']|[0].Value]" --output table
+aws     | S3 buckets                                    | aws s3 ls
+aws     | Folder S3 par sync                            | aws s3 sync ./<folder> s3://<bucket>/<path>
+aws     | Profile badlo                                 | $env:AWS_PROFILE = "<profile>"
+
+azure   | Login                                         | az login
+azure   | Current subscription                          | az account show -o table
+azure   | Resource groups                               | az group list -o table
+azure   | VMs ki list                                   | az vm list -d -o table
+
+tf      | Init                                          | terraform init
+tf      | Format + validate                             | terraform fmt -recursive; terraform validate
+tf      | Plan file mein save                           | terraform plan -out tfplan
+tf      | Saved plan apply                              | terraform apply tfplan
+tf      | State mein resources                          | terraform state list
+
+linux   | Server par SSH (key ke saath)                 | ssh -i <key.pem> ubuntu@<ip>
+linux   | File server par copy                          | scp -i <key.pem> <file> ubuntu@<ip>:/home/ubuntu/
+linux   | Service status                                | sudo systemctl status <service>
+linux   | Service ke live logs                          | sudo journalctl -u <service> -f
+linux   | Kaunsa port kaunsa process                    | sudo ss -tulpn
+linux   | Disk usage                                    | df -h
+linux   | Folder ka size                                | du -sh <folder>
+linux   | Sab se bhari folders                          | du -h --max-depth=1 | sort -hr | head
+
+pg      | Postgres mein login                           | psql -h <host> -U postgres -d <db>
+pg      | Database backup                               | pg_dump -h <host> -U postgres -d <db> -F c -f backup.dump
+pg      | Backup restore                                | pg_restore -h <host> -U postgres -d <db> backup.dump
+
+win     | Port kaun use kar raha                        | Get-NetTCPConnection -LocalPort <port> | Select-Object LocalPort,OwningProcess,State
+win     | Process ko port se band karo                  | Stop-Process -Id (Get-NetTCPConnection -LocalPort <port>).OwningProcess -Force
+win     | Server tak port khula hai?                    | Test-NetConnection <host> -Port 443
+win     | DNS cache saaf                                | ipconfig /flushdns
+win     | PATH refresh (naya install chalane ke liye)   | $env:Path = [Environment]::GetEnvironmentVariable('Path','Machine') + ';' + [Environment]::GetEnvironmentVariable('Path','User')
+win     | VS Code extension IPv4 se install             | Invoke-WebRequest "https://marketplace.visualstudio.com/_apis/public/gallery/publishers/<pub>/vsextensions/<name>/latest/vspackage" -OutFile ext.vsix; code --install-extension ext.vsix
+win     | Profile reload                                | . $PROFILE
+docker  | Running containers ke naam                    | docker ps --format '{{.Names}}'

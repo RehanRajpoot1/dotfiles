@@ -1,0 +1,4 @@
+enkia.tokyo-night
+illixion.vscode-vibrancy-continued
+ms-azuretools.vscode-containers
+pkief.material-icon-theme

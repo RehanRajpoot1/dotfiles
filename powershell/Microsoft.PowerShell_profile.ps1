@@ -1,5 +1,5 @@
 # ---- Prompt (Oh My Posh - Tokyo Night) ----
-oh-my-posh init pwsh --config 'https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/tokyonight_storm.omp.json' | Invoke-Expression
+oh-my-posh init pwsh --config "$HOME\rehan.omp.json" | Invoke-Expression
 
 # ---- File icons in ls ----
 Import-Module Terminal-Icons
@@ -63,3 +63,59 @@ function Show-Banner {
 
 if (-not $env:DOTFILES_NO_BANNER) { Show-Banner }
 
+
+
+# ---- Cheat sheet: Ctrl+G ya "cheat" ----
+$CheatFile = "$HOME\.cheats.txt"
+
+function Select-Cheat {
+    param([string]$Query = '')
+    if (-not (Test-Path $CheatFile)) {
+        Write-Host "Cheat file nahi mili: $CheatFile" -ForegroundColor Yellow
+        return
+    }
+    if (-not (Get-Command fzf -ErrorAction SilentlyContinue)) {
+        Write-Host "fzf install nahi hai: winget install junegunn.fzf" -ForegroundColor Yellow
+        return
+    }
+    $pick = Get-Content $CheatFile |
+        Where-Object { $_.Trim() -and $_ -notmatch '^\s*#' } |
+        fzf --query "$Query" --height 60% --layout reverse --border rounded `
+            --prompt 'cheat > ' --pointer '>' `
+            --header 'Enter = chunein  |  Esc = band' `
+            --color 'bg+:#283457,fg:#a9b1d6,fg+:#c0caf5,hl:#7aa2f7,hl+:#7dcfff,border:#414868,prompt:#bb9af7,pointer:#9ece6a,header:#565f89,info:#e0af68'
+    if ($pick) { ($pick -split '\|', 3)[2].Trim() }
+}
+
+# Command chunein aur clipboard mein copy ho jaye
+function cheat {
+    param([string]$Query = '')
+    $cmd = Select-Cheat $Query
+    if ($cmd) {
+        Set-Clipboard $cmd
+        Write-Host "Copied: $cmd" -ForegroundColor Green
+    }
+}
+
+# Naya cheat add karein:  cheat-add docker "Running containers" "docker ps"
+function cheat-add {
+    param(
+        [Parameter(Mandatory)][string]$Category,
+        [Parameter(Mandatory)][string]$Description,
+        [Parameter(Mandatory)][string]$Command
+    )
+    Add-Content -Path $CheatFile -Value ("{0,-7} | {1,-45} | {2}" -f $Category, $Description, $Command) -Encoding utf8
+    Write-Host "Added: $Description" -ForegroundColor Green
+}
+
+# Ctrl+G: chuni hui command seedha prompt mein aa jaye
+Set-PSReadLineKeyHandler -Chord 'Ctrl+g' -BriefDescription 'Cheat sheet' -ScriptBlock {
+    $line = $null; $cursor = $null
+    [Microsoft.PowerShell.PSConsoleReadLine]::GetBufferState([ref]$line, [ref]$cursor)
+    $cmd = Select-Cheat $line
+    [Microsoft.PowerShell.PSConsoleReadLine]::InvokePrompt()
+    if ($cmd) {
+        [Microsoft.PowerShell.PSConsoleReadLine]::RevertLine()
+        [Microsoft.PowerShell.PSConsoleReadLine]::Insert($cmd)
+    }
+}
