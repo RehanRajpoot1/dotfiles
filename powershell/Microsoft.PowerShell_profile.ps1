@@ -398,3 +398,21 @@ function hints {
 }
 
 if (-not $env:DOTFILES_NO_BANNER) { Show-Shortcuts }
+
+
+# ---- grep (Linux jaisa) ----
+function grep {
+    param(
+        [switch]$i, [switch]$v, [switch]$n,
+        [Parameter(Position = 0, Mandatory)][string]$Pattern,
+        [Parameter(Position = 1)][string[]]$Path,
+        [Parameter(ValueFromPipeline)]$InputObject
+    )
+    begin   { $lines = [System.Collections.Generic.List[string]]::new() }
+    process { if ($null -ne $InputObject) { $InputObject | Out-String -Stream | ForEach-Object { $lines.Add($_) } } }
+    end {
+        $opts = @{ Pattern = $Pattern; CaseSensitive = (-not $i); NotMatch = $v }
+        $res  = if ($Path) { Select-String @opts -Path $Path } else { $lines | Select-String @opts }
+        foreach ($m in $res) { if ($n) { "$($m.LineNumber): $($m.Line)" } else { $m.Line } }
+    }
+}

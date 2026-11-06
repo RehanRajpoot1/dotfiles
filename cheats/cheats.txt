@@ -82,3 +82,5 @@ win     | PATH refresh (naya install chalane ke liye)   | $env:Path = [Environme
 win     | VS Code extension IPv4 se install             | Invoke-WebRequest "https://marketplace.visualstudio.com/_apis/public/gallery/publishers/<pub>/vsextensions/<name>/latest/vspackage" -OutFile ext.vsix; code --install-extension ext.vsix
 win     | Profile reload                                | . $PROFILE
 docker  | Running containers ke naam                    | docker ps --format '{{.Names}}'
+docker  | page-ui container chalao (port 3001)          | docker run -d --name page-ui -p 3001:3000 page-ui
+docker  | Image se container chalao (host:container port) | docker run -d --name <name> -p <host-port>:<container-port> <image>
